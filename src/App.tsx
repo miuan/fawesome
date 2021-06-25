@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
+import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
 import { ApolloProvider } from '@apollo/client'
 
 import Register from './pages/public/Login/Register'
@@ -20,7 +20,7 @@ import Posts from './pages/user/Posts/Posts'
 
 export default function App() {
   return (
-    <Router>
+    <>
       <Header />
       {/*
               A <Switch> looks through all its children <Route>
@@ -72,17 +72,6 @@ export default function App() {
         </ProtectedRoute>
         <ProtectedRoute path="/user/roles/:id" role={'admin'} children={<UserRoleEdit />} />
       </Switch>
-    </Router>
-  )
-}
-
-// You can think of these components as "pages"
-// in your app.
-
-function About() {
-  return (
-    <div>
-      <h2>About</h2>
-    </div>
+    </>
   )
 }
