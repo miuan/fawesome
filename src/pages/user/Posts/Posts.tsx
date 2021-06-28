@@ -6,9 +6,12 @@ import logo from '../../../logo.svg'
 import './Home.css'
 import { Post, TPostModel } from './Post'
 
+const storedPostsRaw = localStorage.getItem('posts') || '[]'
+const storedPosts = JSON.parse(storedPostsRaw)
+
 function Posts() {
   // const posts: Post[] = [{ text: "Initial post " }];
-  const [posts, setPosts] = useState<TPostModel[]>([])
+  const [posts, setPosts] = useState<TPostModel[]>(storedPosts)
   const [text, setText] = useState<string>('')
   const [postForRemoveId, setPostForRemoveId] = useState<TPostModel['id']>()
   //let text = "";
@@ -19,10 +22,11 @@ function Posts() {
     //   newPosts.push(p);
     // }
     // newPosts.push({ id: posts.length + 1, text: "Post " });
-    const newPosts = [...posts, { id: posts.length + 1, text: text }]
+    const postsWithNewOne = [...posts, { id: posts.length + 1, text: text }]
 
     setText('')
-    setPosts(newPosts)
+    setPosts(postsWithNewOne)
+    localStorage.setItem('posts', JSON.stringify(postsWithNewOne))
   }
 
   const onTextChange = (event: any) => {
@@ -35,7 +39,9 @@ function Posts() {
   }
 
   const onDelete: IDeleteModalParams['onDelete'] = (id) => {
-    setPosts(posts.filter((post) => post.id !== id))
+    const postsAfterRemove = posts.filter((post) => post.id !== id)
+    setPosts(postsAfterRemove)
+    localStorage.setItem('posts', JSON.stringify(postsAfterRemove))
     setPostForRemoveId(undefined)
   }
 
