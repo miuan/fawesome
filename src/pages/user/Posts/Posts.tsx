@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { gql } from 'graphql.macro'
+import { loader } from 'graphql.macro'
 import React, { useState } from 'react'
 import { Button } from 'react-bootstrap'
 import DeleteModal, { IDeleteModalParams } from '../../../components/DeleteModal/DeleteModal'
@@ -8,41 +8,24 @@ import Loading from '../../../components/Loading/Loading'
 import './Home.css'
 import { Post, TPostModel } from './Post'
 
-const QUERY = gql`
-{allPost{
-  id,
-  text
-}}
-`
+const CREATE_MUTATION = loader('./graphql/create.gql')
+const ALL_QUERY = loader('./graphql/all.gql')
+const REMOVE_MUTATION = loader('./graphql/remove.gql')
 
 const Posts = () => {
   // const posts: Post[] = [{ text: "Initial post " }];
   const [posts, setPosts] = useState<TPostModel[]>([])
   const [text, setText] = useState<string>('')
   const [postForRemoveId, setPostForRemoveId] = useState<TPostModel['id']>()
-  //let text = "";
 
-  const { data, loading, error, refetch } = useQuery(QUERY)
-
-  const [createPost] = useMutation(gql`
-    mutation CreatePost($text: String) {
-      createPost(text: $text) {
-        id
-        text
-      }
-    }
-`)
-
-
+  const [createPost] = useMutation(CREATE_MUTATION)
+  const { data, loading, error, refetch } = useQuery(ALL_QUERY)
+  const [removePost] = useMutation(REMOVE_MUTATION)
 
   const addPost = async () => {
     setText('')
-    const newOne = await createPost({ variables: { text } })
-    const postsWithNewOne = [...posts, newOne?.data?.createPost as TPostModel]
+    await createPost({ variables: { text } })
     refetch()
-
-    // const newOne = { id: posts.length + 1, text: text }
-
   }
 
   const onTextChange = (event: any) => {
@@ -54,10 +37,10 @@ const Posts = () => {
     setPostForRemoveId(id)
   }
 
-  const onDelete: IDeleteModalParams['onDelete'] = (id) => {
-    const postsAfterRemove = posts.filter((post) => post.id !== id)
-    setPosts(postsAfterRemove)
+  const onDelete: IDeleteModalParams['onDelete'] = async (id) => {
+    await removePost({ variables: { id } })
     setPostForRemoveId(undefined)
+    refetch()
   }
 
   const onDeleteModalHide = () => {
@@ -65,11 +48,11 @@ const Posts = () => {
   }
 
   if (loading) {
-    return (<Loading />)
+    return <Loading />
   }
 
   if (error) {
-    return (<>{`Error! ${error}`}</>);
+    return <>{`Error! ${error}`}</>
   }
 
   return (

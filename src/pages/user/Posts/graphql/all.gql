@@ -1,0 +1,6 @@
+{
+    allPost{
+        id,
+        text
+    }
+}
