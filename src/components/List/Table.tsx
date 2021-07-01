@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Table as BTable, Button } from 'react-bootstrap'
+import { Table as BTable } from 'react-bootstrap'
 
 import { useQuery, useMutation } from '@apollo/client'
 import { IListRowParams, ListRow } from './Row'
@@ -42,7 +41,6 @@ export const Table: React.FC<ITableList> = ({
   getEditLink,
 }) => {
   const [unauthorized, setUnauthorized] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteObject, setDeleteObject] = useState(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [deletingOnDeleteDialog, setDeletingOnDeleteDialog] = useState(false)
@@ -51,12 +49,12 @@ export const Table: React.FC<ITableList> = ({
   const [data, setData] = useState<any>([])
   const [error, setError] = useState<any>()
 
-  const { refetch: userRefetch, loading: userLoading } = useQuery(
+  const { refetch: userRefetch } = useQuery(
     adminMode ? queries.ADMIN_LIST_QUERY : queries.USER_LIST_QUERY,
     {
       onError: (e) => {
         console.log('onError >>> ', e.message)
-        if (e.message == 'GraphQL error: Unauhorized') {
+        if (e.message === 'GraphQL error: Unauhorized') {
           setUnauthorized(true)
         } else {
           setError(e)
@@ -77,7 +75,7 @@ export const Table: React.FC<ITableList> = ({
     },
   )
 
-  const [deleteProjectMutation, { loading: deleteLoading, error: deleteError }] = useMutation(
+  const [deleteProjectMutation] = useMutation(
     queries.DELETE_MUTATION,
     {
       errorPolicy: 'none',
@@ -88,7 +86,7 @@ export const Table: React.FC<ITableList> = ({
       },
       onError: (e) => {
         console.log('onError >>> ', e.message)
-        if (e.message == 'GraphQL error: Unauhorized') {
+        if (e.message === 'GraphQL error: Unauhorized') {
           setUnauthorized(true)
         }
       },
@@ -118,7 +116,7 @@ export const Table: React.FC<ITableList> = ({
   if (unauthorized) {
     return <Unauthorized where={'projects'} />
   }
-  if (userLoading) return <Loading what={'projects'} />
+  if (loading) return <Loading what={'projects'} />
 
   return (
     <div>

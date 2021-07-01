@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Link, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import FilterItem from './FilterItem'
-import { Navbar, Button } from 'react-bootstrap'
+import { Button } from 'react-bootstrap'
 import './FilteredList.css'
 import { IFilteredField } from './RowItem'
 import Table, { ITableList, ITableQueries } from './Table'
@@ -27,7 +27,7 @@ const createFilter = () => {
 const addAnd = (node: any, filter: any) => {
   let obj: any = filter
 
-  if (node.name != 'AND') {
+  if (node.name !== 'AND') {
     obj = [obj]
     obj.name = 'AND'
   }
@@ -91,7 +91,7 @@ export const FilteredList: React.FC<IProjectFilterList> = ({ name, userId, admin
   useEffect(() => {
     const defaultFilter = createDefaultFilter(userId)
     processFilter(defaultFilter)
-  }, [userId])
+  })
 
   const onFilterChange = useCallback(
     (f: string | null) => {

@@ -64,8 +64,6 @@ const userFromStorage = () => {
   } as UserWithToken
 }
 
-const initialSelected = localStorage.getItem('organization.selected')
-
 const initialState: UserState = {
   user: userFromStorage(),
   state: 'no-user',

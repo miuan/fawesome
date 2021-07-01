@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
-import logo from "../../../logo.svg";
 // import { Counter } from './features/counter/Counter';
 import "./Home.css";
 import { Post, TPostModel } from "./Post";

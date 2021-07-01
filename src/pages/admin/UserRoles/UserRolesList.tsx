@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
-import FilteredList from "../../../components/List/FilteredList";
-import gql from 'graphql-tag';
 import { loader } from "graphql.macro";
+import React from "react";
+import FilteredList from "../../../components/List/FilteredList";
 
 const USER_LIST_QUERY = loader('./graphql/query-all-user-role-admin.gql')
 const ADMIN_LIST_QUERY = loader('./graphql/query-all-user-role-admin.gql')

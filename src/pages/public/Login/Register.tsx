@@ -1,13 +1,12 @@
-import React, { useState } from "react";
-import gql from "graphql-tag";
 import { useMutation } from "@apollo/client";
-import { Modal, Form, Alert, Button, ProgressBar } from "react-bootstrap";
+import { loader } from 'graphql.macro';
+import React, { useState } from "react";
+import { Alert, Button, Form } from "react-bootstrap";
 import { Link, useHistory } from 'react-router-dom';
+import { useAppDispatch } from "../../../app/hooks";
+import { changeState, login, UserToken } from "../../../app/reducers/userSlice";
 import { isEmailValid, passwordStrong } from "../../../app/utils";
 import PasswordComponent from "./PasswordComponent";
-import { loader } from 'graphql.macro';
-import { useAppDispatch } from "../../../app/hooks";
-import { login, UserToken, changeState } from "../../../app/reducers/userSlice";
 
 export const REGISTER_MUTATION = loader('./graphql/register.gql')
 
@@ -21,7 +20,7 @@ export const Register: React.FC = () => {
   const history = useHistory()
   const dispatch = useAppDispatch();
 
-  const [registerMutation, { loading, data, error }] = useMutation(REGISTER_MUTATION, {
+  const [registerMutation, { loading, data }] = useMutation(REGISTER_MUTATION, {
     errorPolicy: "none",
   });
 
@@ -75,7 +74,7 @@ export const Register: React.FC = () => {
     setCopy(c)
     setInvalidEmail(false)
 
-    if (c == pass) {
+    if (c === pass) {
       setInvalidCopy(false)
     }
   };

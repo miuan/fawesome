@@ -6,7 +6,7 @@ import { selectUser } from '../../app/reducers/userSlice'
 export const ProtectRoute: React.FC<{ path: string, role?: string, exact?: boolean }> = ({ path, role, exact, children }) => {
     const user = useSelector(selectUser)
 
-    if (role && !user?.roles.find(r => r.name == role)) {
+    if (role && !user?.roles.find(r => r.name === role)) {
         return (<Redirect to={`/login?path=${path}&role=${role}`} />)
     }
 

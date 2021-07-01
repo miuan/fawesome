@@ -24,7 +24,7 @@ export const Login: React.FC = () => {
     const defaultPath = process.env.REACT_APP_DEFAULT_USER_PATH || '/user/dashboard'
 
     const dispatch = useAppDispatch();
-    const [loginMutation, { loading, data, error }] = useMutation(LOGIN_QL, { errorPolicy: 'none' });
+    const [loginMutation, { loading }] = useMutation(LOGIN_QL, { errorPolicy: 'none' });
 
     const onLogin = async () => {
         if (!isEmailValid(email)) {

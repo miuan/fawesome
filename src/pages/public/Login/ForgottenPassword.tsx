@@ -1,10 +1,8 @@
-import React, { useState } from "react";
-import gql from "graphql-tag";
 import { useMutation } from "@apollo/client";
-import { Modal, Form, Alert, Button } from "react-bootstrap";
-import { Link, useHistory } from 'react-router-dom';
-import { isEmailValid } from "../../../app/utils";
 import { loader } from "graphql.macro";
+import React, { useState } from "react";
+import { Alert, Button, Form } from "react-bootstrap";
+import { isEmailValid } from "../../../app/utils";
 
 const FORGOTTEN_PASSWORD_REQUEST_MUTATION = loader('./graphql/forgotten-password-request.gql');
 
@@ -13,22 +11,16 @@ export const ForgottenPassword: React.FC = () => {
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false)
 
-  const history = useHistory()
-
-  const [checkResetEmail, { loading: loadingCheckResetEmail, data: checkResetEmailData, error: checkResetEmailError }] = useMutation(FORGOTTEN_PASSWORD_REQUEST_MUTATION, {
-    errorPolicy: "none",
-  });
-
-  const [doForgottenPassword, { loading, data, error }] = useMutation(FORGOTTEN_PASSWORD_REQUEST_MUTATION, {
+  const [doForgottenPassword, { loading, data, }] = useMutation(FORGOTTEN_PASSWORD_REQUEST_MUTATION, {
     errorPolicy: "none",
   });
 
   const onRequestSend = async () => {
     setEmailSent(false)
-    if(email && isEmailValid(email)){
+    if (email && isEmailValid(email)) {
       setInvalidEmail(false)
       try {
-        const { data } = await doForgottenPassword({ variables: { email } })
+        await doForgottenPassword({ variables: { email } })
         setEmailSent(true)
       } catch (ex) {
         console.log('onError', data)
@@ -44,10 +36,10 @@ export const ForgottenPassword: React.FC = () => {
     setInvalidEmail(false);
   };
 
-  if(emailSent) {
+  if (emailSent) {
     return (
       <>
-      <Alert variant={"success"}>We sent to You instruction to email {email}. Check your mailbox (don't forget check spam as well)</Alert>
+        <Alert variant={"success"}>We sent to You instruction to email {email}. Check your mailbox (don't forget check spam as well)</Alert>
       </>
     )
   }
@@ -79,7 +71,7 @@ export const ForgottenPassword: React.FC = () => {
 
 
               <Form>
-              <Form.Group controlId="formBasicEmail">
+                <Form.Group controlId="formBasicEmail">
                   <Form.Label>Email address</Form.Label>
                   <Form.Control
                     type="email"
@@ -93,7 +85,7 @@ export const ForgottenPassword: React.FC = () => {
                   </Form.Text>
                 </Form.Group>
 
-                
+
               </Form>
 
               <div id='submit' className="pull-left">

@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { Link, useHistory, useLocation } from 'react-router-dom'
 import _ from 'lodash'
+import React, { useEffect, useState } from 'react'
 import { Alert } from 'react-bootstrap'
-import { getGraphqlMonsterClientAppRoot } from '../../../app/utils'
+import { Link, useHistory, useLocation } from 'react-router-dom'
 import { useAppDispatch } from '../../../app/hooks'
-import { login, UserToken } from '../../../app/reducers/userSlice'
+import { login } from '../../../app/reducers/userSlice'
+import { getGraphqlMonsterClientAppRoot } from '../../../app/utils'
 
-export const tokenFromFacebookCode = async (type:string, code: string) => {
+export const tokenFromFacebookCode = async (type: string, code: string) => {
     return axios.get(`${getGraphqlMonsterClientAppRoot()}/auth/${type}/callback?code=${code}`)
 }
 
-export const PassportCallback: React.FC<{type: string}> = ({type}) => {
+export const PassportCallback: React.FC<{ type: string }> = ({ type }) => {
     const location = useLocation()
     const codeRaw = _.get(location, 'search', '').split('?code=')
     const code = codeRaw.length > 1 ? codeRaw[1] : ''
@@ -22,29 +22,30 @@ export const PassportCallback: React.FC<{type: string}> = ({type}) => {
 
     const [error, setError] = useState<string>()
 
-    const showError = (errorMessage:string) => {
+    const showError = (errorMessage: string) => {
         setError(errorMessage)
-        setTimeout(()=>{
+        setTimeout(() => {
             history.replace('/login')
         }, 4000)
     }
-    useEffect(()=>{
+
+    useEffect(() => {
         const request = async () => {
             try {
                 const data = await tokenFromFacebookCode(type, code)
                 dispatch(login(data as any))
                 history.replace('/user/projects')
-            } catch(ex) {
+            } catch (ex) {
                 const response = JSON.parse(_.get(ex, 'request.response', '{}'))
                 showError(response.error?.message || ex.message)
             }
-            
-           
+
+
         }
 
-        if(code) request()
+        if (code) request()
         else showError('User denied')
-    }, [location])
+    })
 
     return (<>
         {error && <Alert variant={'danger'}>{type} login isn't work due "{error}" You will be redirect back to <Link to="/login">Login</Link></Alert>}

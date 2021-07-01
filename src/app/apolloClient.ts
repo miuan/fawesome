@@ -6,7 +6,7 @@ import { RetryLink } from '@apollo/client/link/retry'
 
 const retryLink = new RetryLink({
   attempts: (count, operation, error) => {
-    return true
+    return count < 3
   },
   delay: (count, operation, error) => {
     return count * 1000 * Math.random()
@@ -90,16 +90,16 @@ const authLink = setContext((_, { headers }) => {
 })
 
 const httpLink = createHttpLink({
-  uri: `${process.env.REACT_APP_HOST}`,
+  uri: process.env.REACT_APP_HOST,
 })
 
 // @ts-ignore
 const erroLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
-  if (graphQLErrors) graphQLErrors.map(({ message, locations, path }) => console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`))
-
-  if (graphQLErrors && graphQLErrors?.length > 0 && graphQLErrors[0].message == 'Unauthorized') {
-    // @ts-ignore
-    return unautheniticatedAction(forward, operation)
+  if (graphQLErrors){
+    if(graphQLErrors.some((error) => (error as any).tokenExpired)) {
+      return unautheniticatedAction(forward, operation)
+    }
+    graphQLErrors.map(({ message, locations, path }) => console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`))
   }
 
   if (networkError) console.log(`[Network error]: ${networkError}`)
