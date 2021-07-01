@@ -1,0 +1,7 @@
+@all("public")
+@create("public")
+@remove("public")
+model Post {
+    text: String
+    image: String
+}

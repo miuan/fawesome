@@ -1,32 +1,48 @@
+import { useMutation, useQuery } from '@apollo/client'
+import { gql } from 'graphql.macro'
 import React, { useState } from 'react'
 import { Button } from 'react-bootstrap'
 import DeleteModal, { IDeleteModalParams } from '../../../components/DeleteModal/DeleteModal'
-import logo from '../../../logo.svg'
+import Loading from '../../../components/Loading/Loading'
 // import { Counter } from './features/counter/Counter';
 import './Home.css'
 import { Post, TPostModel } from './Post'
 
-const storedPostsRaw = localStorage.getItem('posts') || '[]'
-const storedPosts = JSON.parse(storedPostsRaw)
+const QUERY = gql`
+{allPost{
+  id,
+  text
+}}
+`
 
-function Posts() {
+const Posts = () => {
   // const posts: Post[] = [{ text: "Initial post " }];
-  const [posts, setPosts] = useState<TPostModel[]>(storedPosts)
+  const [posts, setPosts] = useState<TPostModel[]>([])
   const [text, setText] = useState<string>('')
   const [postForRemoveId, setPostForRemoveId] = useState<TPostModel['id']>()
   //let text = "";
 
-  const addPost = () => {
-    // const newPosts = [];
-    // for (const p of posts) {
-    //   newPosts.push(p);
-    // }
-    // newPosts.push({ id: posts.length + 1, text: "Post " });
-    const postsWithNewOne = [...posts, { id: posts.length + 1, text: text }]
+  const { data, loading, error, refetch } = useQuery(QUERY)
 
+  const [createPost] = useMutation(gql`
+    mutation CreatePost($text: String) {
+      createPost(text: $text) {
+        id
+        text
+      }
+    }
+`)
+
+
+
+  const addPost = async () => {
     setText('')
-    setPosts(postsWithNewOne)
-    localStorage.setItem('posts', JSON.stringify(postsWithNewOne))
+    const newOne = await createPost({ variables: { text } })
+    const postsWithNewOne = [...posts, newOne?.data?.createPost as TPostModel]
+    refetch()
+
+    // const newOne = { id: posts.length + 1, text: text }
+
   }
 
   const onTextChange = (event: any) => {
@@ -41,12 +57,19 @@ function Posts() {
   const onDelete: IDeleteModalParams['onDelete'] = (id) => {
     const postsAfterRemove = posts.filter((post) => post.id !== id)
     setPosts(postsAfterRemove)
-    localStorage.setItem('posts', JSON.stringify(postsAfterRemove))
     setPostForRemoveId(undefined)
   }
 
   const onDeleteModalHide = () => {
     setPostForRemoveId(undefined)
+  }
+
+  if (loading) {
+    return (<Loading />)
+  }
+
+  if (error) {
+    return (<>{`Error! ${error}`}</>);
   }
 
   return (
@@ -56,7 +79,7 @@ function Posts() {
       <Button onClick={addPost}>Add Post</Button>
 
       <h4>Post</h4>
-      {posts.map((post, idx) => (
+      {data?.allPost?.map((post: any, idx: number) => (
         <div key={idx}>
           {post.id} {post.text}{' '}
           <Button
