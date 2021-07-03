@@ -17,6 +17,7 @@ import UsersList from './pages/admin/Users/UsersList'
 import UserRolesList from './pages/admin/UserRoles/UserRolesList'
 import UserRoleEdit from './pages/admin/UserRoles/UserRolesEdit'
 import Posts from './pages/user/Posts/Posts'
+import Posts2 from './pages/user/Posts2/Posts2'
 
 export default function App() {
   return (
@@ -35,6 +36,9 @@ export default function App() {
         </Route>
         <Route exact path="/posts">
           <Posts />
+        </Route>
+        <Route exact path="/posts2">
+          <Posts2 />
         </Route>
         <Route exact path="/login">
           <Login />

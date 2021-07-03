@@ -31,7 +31,8 @@ function Home() {
 
   return (
     <div className="App">
-      <Link to={'/posts'}> Posts </Link>
+      <div><Link to={'/posts'}> Posts </Link></div>
+      <div><Link to={'/posts2'}> Posts V2</Link></div>
     </div>
   );
 }

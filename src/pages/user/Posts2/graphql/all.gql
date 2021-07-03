@@ -1,0 +1,9 @@
+{
+    allPost_v2{
+        id,
+        text,
+        color,
+        images{publicKey,id}
+        user{email}
+    }
+}
