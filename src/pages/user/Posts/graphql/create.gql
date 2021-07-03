@@ -1,5 +1,5 @@
-mutation CreatePost($text: String) {
-    createPost(text: $text) {
+mutation CreatePost($text: String, $image: String) {
+    createPost(text: $text, image: $image) {
         id
         text
     }

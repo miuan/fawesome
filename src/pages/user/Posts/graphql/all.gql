@@ -1,6 +1,7 @@
 {
     allPost{
         id,
-        text
+        text,
+        image
     }
 }

@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { UserToken } from './reducers/userSlice'
 
 export const getGraphqlMonsterClientAppRoot = () =>
   process.env.REACT_APP_HOST?.substr(0, process.env.REACT_APP_HOST?.length - 8)
@@ -67,19 +66,42 @@ export const passwordStrong = (password: string): IPasswordStrongResult => {
   } as IPasswordStrongResult
 }
 
-export const uploadFile = async (event: React.FormEvent<HTMLInputElement>, user: UserToken) => {
+export type TUploadFileCallback = (err: any, data: any)=>void | null | undefined
+export const uploadFile = (name='files') => async (event: React.FormEvent<HTMLInputElement>, callback:TUploadFileCallback|null| undefined = undefined) => {
+  const userToken = localStorage.getItem('user.token')
   const files = event.currentTarget?.files || []
   const file = files[0]
 
   const data = new FormData()
   data.append('file', file)
   return new Promise(async (resolve, reject) => {
-    const event = await axios.post(`${getGraphqlMonsterClientAppRoot()}/upload`, data, {
-      // authorization: Bearer
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    })
-    resolve(event)
+    try {
+      const event = await axios.post(`${getGraphqlMonsterClientAppRoot()}/upload`, data, {
+        // authorization: Bearer
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+
+      if(callback){
+        callback(null, event.data)
+      }
+      resolve(event.data)
+    } catch(ex) {
+      let error = ex
+      if(ex.response?.data?.error?.message){
+        error = ex.response?.data.error
+      }
+
+      if(error.message === "Network Error"){
+        error.message = 'File is too large (max file size is 1Mb)'
+      }
+
+      if(callback){
+        callback(error, null)
+      }
+      reject(error)
+    }
+    
   })
 }
