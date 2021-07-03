@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { loader } from 'graphql.macro'
 import React, { useState } from 'react'
-import { Alert, Button, Form } from 'react-bootstrap'
+import { Alert, Button, Carousel, Form } from 'react-bootstrap'
 
 import { uploadFile } from '../../../app/utils'
 import DeleteModal, { IDeleteModalParams } from '../../../components/DeleteModal/DeleteModal'
@@ -38,7 +38,7 @@ const Posts = () => {
 
     const variables = { text, color } as any
     if (images && images.length > 0) {
-      const uploadedImages = await Promise.all(images.map((image: any) => handeUpload(image.raw)))
+      const uploadedImages = await Promise.all(images.map((image: any) => handeUpload(image.file)))
       variables.imagesIds = uploadedImages.map((ui: any) => ui.id)
     }
 
@@ -77,10 +77,15 @@ const Posts = () => {
 
   const onFileChange = (event: React.FormEvent<HTMLInputElement>) => {
     const target = event.target as any
-    setImages([...images, {
-      preview: URL.createObjectURL(target?.files[0]),
-      raw: target?.files[0]
-    }])
+    if (target?.files?.length > 0) {
+      const added = Array.from(target?.files).map((file: any) => ({
+        preview: URL.createObjectURL(file),
+        file
+      }))
+
+      setImages([...images, ...added])
+    }
+
 
   }
 
@@ -123,7 +128,7 @@ const Posts = () => {
                 <label className="photoButton" htmlFor="uploadImage">
                   <div >Add photo</div>
                 </label>
-                <input type="file" id="uploadImage" onChange={onFileChange} style={{ display: 'none' }} />
+                <input type="file" id="uploadImage" onChange={onFileChange} style={{ display: 'none' }} multiple={true} />
               </td>
 
             </tr>
@@ -164,15 +169,7 @@ const Posts = () => {
             <h5>{post.user?.email}</h5>
 
             <Text text={post.text} color={post.color} hasImages={!!post.images?.length} />
-
-            {post.images && post.images.length > 0 && <table>
-
-              {post.images && post.images.map((image: any) => (<tr><td>
-                <Image publicKey={image.publicKey} width={'800px'} height={'600px'} />
-              </td></tr>))}
-
-            </table>
-            }
+            <CarouselImages images={post.images} />
             <div
               // size={'sm'}
               // variant={'danger'}
@@ -208,6 +205,20 @@ export const Text = ({ text, color, hasImages }: { text: string, color?: string,
   return (<div className="hightligtedText" style={{ backgroundColor: color }}>
     {text}
   </div>)
+}
+
+const CarouselImages = ({ images }: { images: any[] }) => {
+  return (<Carousel >
+    {images.map((image) => (<Carousel.Item>
+      <Image publicKey={image.publicKey} width={'800px'} height={'600px'} />
+      <Carousel.Caption>
+        <h3>First slide label</h3>
+        <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+      </Carousel.Caption>
+    </Carousel.Item>))
+    }
+
+  </Carousel>)
 }
 
 export const PreviewImage = ({ src, width, height }: { src: string, width?: string | number, height?: string | number }) => {
