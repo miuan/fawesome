@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import logo from "../../../logo.svg";
 // import { Counter } from './features/counter/Counter';
 import "./Home.css";
@@ -30,16 +31,7 @@ function Home() {
 
   return (
     <div className="App">
-      <h4>Add Post</h4>
-      <input type="text" value={text} onChange={onTextChange} />
-      <Button onClick={addPost}>Add Post</Button>
-
-      <h4>Post</h4>
-      {posts.map((post, idx) => (
-        <div key={idx}>
-          <Post post={post} />
-        </div>
-      ))}
+      <Link to={'/posts'}> Posts </Link>
     </div>
   );
 }

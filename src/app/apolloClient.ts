@@ -23,7 +23,7 @@ const resolvePendingRequests = () => {
 }
 
 // https://able.bio/AnasT/apollo-graphql-async-access-token-refresh--470t1c8
-const unautheniticatedAction = (forward: any, operation: any) => {
+const refreshTokenAction = (forward: any, operation: any) => {
   // error code is set to UNAUTHENTICATED
   // when AuthenticationError thrown in resolver
   let forward$
@@ -95,16 +95,15 @@ const httpLink = createHttpLink({
 
 // @ts-ignore
 const erroLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
-  if (graphQLErrors) graphQLErrors.map(({ message, locations, path }) => console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`))
-
-  if (graphQLErrors && graphQLErrors?.length > 0 && graphQLErrors[0].message == 'Unauthorized') {
-    // @ts-ignore
-    return unautheniticatedAction(forward, operation)
+  if (graphQLErrors){
+    if(graphQLErrors.some((error) => (error as any).tokenExpired)) {
+      return refreshTokenAction(forward, operation)
+    }
+    graphQLErrors.map(({ message, locations, path }) => console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`))
   }
 
   if (networkError) console.log(`[Network error]: ${networkError}`)
 })
-
 export const apolloClient = new ApolloClient({
   link: ApolloLink.from([retryLink, erroLink, authLink, httpLink]),
   cache: new InMemoryCache(),

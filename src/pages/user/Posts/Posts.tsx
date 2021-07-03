@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client'
 import { loader } from 'graphql.macro'
 import React, { useState } from 'react'
-import { Button } from 'react-bootstrap'
+import { Alert, Button } from 'react-bootstrap'
 import DeleteModal, { IDeleteModalParams } from '../../../components/DeleteModal/DeleteModal'
 import Loading from '../../../components/Loading/Loading'
 // import { Counter } from './features/counter/Counter';
@@ -18,9 +18,9 @@ const Posts = () => {
   const [text, setText] = useState<string>('')
   const [postForRemoveId, setPostForRemoveId] = useState<TPostModel['id']>()
 
-  const [createPost] = useMutation(CREATE_MUTATION)
-  const { data, loading, error, refetch } = useQuery(ALL_QUERY)
-  const [removePost] = useMutation(REMOVE_MUTATION)
+  const [createPost, { error: createError }] = useMutation(CREATE_MUTATION)
+  const { data, loading, error: loadingError, refetch } = useQuery(ALL_QUERY)
+  const [removePost, { error: removeError }] = useMutation(REMOVE_MUTATION)
 
   const addPost = async () => {
     setText('')
@@ -51,13 +51,14 @@ const Posts = () => {
     return <Loading />
   }
 
-  if (error) {
-    return <>{`Error! ${error}`}</>
-  }
+
 
   return (
     <div className="App">
       <h4>Add Post</h4>
+      {createError && <Alert variant={'danger'}>Add post: {createError.message}</Alert>}
+      {removeError && <Alert variant={'danger'}>Remove post: {removeError.message}</Alert>}
+      {loadingError && <Alert variant={'danger'}>Loading: {loadingError.message}</Alert>}
       <input type="text" value={text} onChange={onTextChange} />
       <Button onClick={addPost}>Add Post</Button>
 
