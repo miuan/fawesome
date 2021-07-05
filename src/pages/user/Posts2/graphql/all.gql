@@ -1,5 +1,5 @@
 {
-    allPost_v2{
+    allPost_v2(orderBy: createdAt_desc){
         id,
         text,
         color,

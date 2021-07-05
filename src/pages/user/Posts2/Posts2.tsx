@@ -36,6 +36,7 @@ const Posts = () => {
   const addPost = async () => {
     setText('')
 
+
     const variables = { text, color } as any
     if (images && images.length > 0) {
       const uploadedImages = await Promise.all(images.map((image: any) => handeUpload(image.file)))
